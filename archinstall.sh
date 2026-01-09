@@ -13,9 +13,9 @@ fi
 
 parted -s $disk mklabel gpt
 parted -s $disk mkpart primary ext4 1MiB 14000MiB
-parted -s $disk mkpart primary ext4 14001MiB 36000MiB
-parted -s $disk mkpart primary fat32 50001MiB 2000MiB
-parted -s $disk mkpart primary linux-swap 52001MiB 8000MiB
+parted -s $disk mkpart primary ext4 14001MiB 50000MiB
+parted -s $disk mkpart primary fat32 50001MiB 52000MiB
+parted -s $disk mkpart primary linux-swap 52001MiB 60000MiB
 
 rootpart="${disk}1"
 homepart="${disk}2"

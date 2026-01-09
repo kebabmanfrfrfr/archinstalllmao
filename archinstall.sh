@@ -28,12 +28,11 @@ swapstart=$(( bootstart + bootsize + 1048576 ))
 # dysk leci pa pa XDDDDDDD
 dd if=/dev/zero of=${disk} status=progress bs=8192
 
-parted -s ${disk}
-parted -s mklabel gpt
-parted -s mkpart primary ext4 ${rootstart} ${rootsize}
-parted -s mkpart primary ext4 ${homestart} ${homesize}
-parted -s mkpart primary fat32 ${bootstart} ${bootsize}
-parted -s mkpart primary linux-swap ${swapstart} ${swapsize}
+parted -s ${disk} mklabel gpt
+parted -s ${disk} mkpart primary ext4 ${rootstart} ${rootsize}
+parted -s ${disk} mkpart primary ext4 ${homestart} ${homesize}
+parted -s ${disk} mkpart primary fat32 ${bootstart} ${bootsize}
+parted -s ${disk} mkpart primary linux-swap ${swapstart} ${swapsize}
 
 rootpart="${disk}1"
 homepart="${disk}2"

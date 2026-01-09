@@ -11,9 +11,6 @@ if ! ping -c 1 ping.archlinux.org; then
     exit 1
 fi
 
-pacman-key --init
-pacman-key --populate
-
 bootsize=2147483648
 swapsize=17179869184
 disksize=$(lsblk -b --output SIZE -n -d ${disk})
@@ -26,33 +23,33 @@ bootstart=$(( rootsize + homesize + 1048576 ))
 swapstart=$(( bootstart + bootsize + 1048576 ))
 
 # dysk leci pa pa XDDDDDDD
-dd if=/dev/zero of=${disk} status=progress bs=8192
+dd if=/dev/zero of=$disk status=progress bs=8192
 
-parted -s ${disk} mklabel gpt
-parted -s ${disk} mkpart primary ext4 ${rootstart} ${rootsize}
-parted -s ${disk} mkpart primary ext4 ${homestart} ${homesize}
-parted -s ${disk} mkpart primary fat32 ${bootstart} ${bootsize}
-parted -s ${disk} mkpart primary linux-swap ${swapstart} ${swapsize}
+parted -s $disk mklabel gpt
+parted -s $disk mkpart primary ext4 $rootstart $rootsize
+parted -s $disk mkpart primary ext4 $homestart $homesize
+parted -s $disk mkpart primary fat32 $bootstart $bootsize
+parted -s $disk mkpart primary linux-swap $swapstart $swapsize
 
 rootpart="${disk}1"
 homepart="${disk}2"
 bootpart="${disk}3"
 swappart="${disk}4"
 
-parted -s ${rootpart} set root
-parted -s ${homepart} set linux-home
-parted -s ${bootpart} set esp
-parted -s ${swappart} set swap
+parted -s $rootpart set root
+parted -s $homepart set linux-home
+parted -s $bootpart set esp
+parted -s $swappart set swap
 
-mkfs.ext4 ${rootpart}
-mkfs.ext4 ${homepart}
-mkfs.fat -F 32 ${bootpart}
-mkswap ${swappart}
+mkfs.ext4 $rootpart
+mkfs.ext4 $homepart
+mkfs.fat -F 32 $bootpart
+mkswap $swappart
 
-mount ${rootpart} /mnt
-mount ${homepart} /mnt/home --mkdir
-mount ${bootpart} /mnt/boot --mkdir
-swapon ${swappart}
+mount $rootpart /mnt
+mount $homepart /mnt/home --mkdir
+mount $bootpart /mnt/boot --mkdir
+swapon $swappart
 
 pacstrap -K /mnt base linux linux-firmware hyprland kitty firefox wofi dolphin base-devel neovim grub efibootmgr
 genfstab -U /mnt >> /mnt/etc/fstab

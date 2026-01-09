@@ -12,30 +12,21 @@ if ! ping -c 1 ping.archlinux.org; then
 fi
 
 parted -s $disk mklabel gpt
-parted -s $disk mkpart primary ext4 1MiB 14000MiB
-parted -s $disk mkpart primary ext4 14001MiB 50000MiB
-parted -s $disk mkpart primary fat32 50001MiB 52000MiB
-parted -s $disk mkpart primary linux-swap 52001MiB 60000MiB
-
-rootpart="${disk}1"
-homepart="${disk}2"
-bootpart="${disk}3"
-swappart="${disk}4"
+parted -s $disk mkpart primary fat32 1MiB 2048MiB
+parted -s $disk mkpart primary ext4 2049MiB 51200MiB
+bootpart=$disk"1"
+rootpart=$disk"2"
 
 parted -s $rootpart set root
-parted -s $homepart set linux-home
 parted -s $bootpart set esp
-parted -s $swappart set swap
 
 mkfs.ext4 $rootpart
-mkfs.ext4 $homepart
 mkfs.fat -F 32 $bootpart
-mkswap $swappart
 
 mount $rootpart /mnt
-mount $homepart /mnt/home --mkdir
 mount $bootpart /mnt/boot --mkdir
-swapon $swappart
+
+mkdir /mnt/home
 
 pacstrap -K /mnt base linux linux-firmware hyprland kitty firefox wofi dolphin base-devel neovim grub efibootmgr
 genfstab -U /mnt >> /mnt/etc/fstab

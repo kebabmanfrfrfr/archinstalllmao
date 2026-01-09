@@ -11,25 +11,11 @@ if ! ping -c 1 ping.archlinux.org; then
     exit 1
 fi
 
-bootsize=2147483648
-swapsize=17179869184
-disksize=$(lsblk -b --output SIZE -n -d ${disk})
-rootsize=$(( (disksize - bootsize - swapsize) / 4 ))
-homesize=$(( disksize - bootsize - swapsize - rootsize ))
-
-rootstart=1048576
-homestart=$(( rootsize + 1048576 ))
-bootstart=$(( rootsize + homesize + 1048576 ))
-swapstart=$(( bootstart + bootsize + 1048576 ))
-
-# dysk leci pa pa XDDDDDDD
-dd if=/dev/zero of=$disk status=progress bs=8192
-
 parted -s $disk mklabel gpt
-parted -s $disk mkpart primary ext4 $rootstart $rootsize
-parted -s $disk mkpart primary ext4 $homestart $homesize
-parted -s $disk mkpart primary fat32 $bootstart $bootsize
-parted -s $disk mkpart primary linux-swap $swapstart $swapsize
+parted -s $disk mkpart primary ext4 1MiB 14000MiB
+parted -s $disk mkpart primary ext4 14001MiB 36000MiB
+parted -s $disk mkpart primary fat32 50001MiB 2000MiB
+parted -s $disk mkpart primary linux-swap 52001MiB 8000MiB
 
 rootpart="${disk}1"
 homepart="${disk}2"
